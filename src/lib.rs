@@ -1,4 +1,5 @@
 use clap::{arg, command, ArgAction, ArgMatches, Command};
+use colored::Colorize;
 use std::{
     env,
     error::Error,
@@ -15,8 +16,10 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         Some(("add", matches)) => add(matches)?,
         Some(("done", _matches)) => println!("done"),
         Some(("remove", _matches)) => println!("remove"),
-        _ => print_content()?,
+        _ => (),
     }
+
+    print_content()?;
 
     Ok(())
 }
@@ -100,9 +103,12 @@ fn print_content() -> Result<(), Box<dyn Error>> {
     let content = get_data_file_content()?;
     //prints the content inside the todo.md file
 
-    //dbg!("printig content...");
     content.lines().fold("", |_inc, s| {
-        println!("{s}");
+        match &s[..=5] {
+            "- [ ] " => println!("{}", &s[6..]),
+            "- [x] " => println!("{}", &s[6..].strikethrough().white()),
+            _ => ()
+        }
         s
     });
 
@@ -110,13 +116,16 @@ fn print_content() -> Result<(), Box<dyn Error>> {
 }
 
 fn add(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
-    let data_file_content = get_data_file_content()?;
     let items = args_collect(matches, "ITEM");
+    let mut new_content: String = get_data_file_content()?;
 
-    fs::write(
-        get_data_file_path()?,
-        format!("{data_file_content}\n{}", items.join("\n")),
-    )?;
+    for item in items {
+        new_content.push_str("- [ ] ");
+        new_content.push_str(item);
+        new_content.push('\n');
+    }
+
+    fs::write(get_data_file_path()?, new_content)?;
 
     Ok(())
 }

@@ -1,5 +1,9 @@
-todo:
-    add <p1, p2, ..., n>
-    done <p1, p2, ..., n> / *
-    remove <p1, p2, ..., n> / *
-    edit arg
+add:
+- [ ] niente tasks duplicate
+- [x] aggiungere automaticamente checkbox nel file markdown
+ 
+done:
+- [ ] da implementare 
+
+remove:
+- [ ] da implementare 
