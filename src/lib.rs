@@ -107,7 +107,7 @@ fn print_content() -> Result<(), Box<dyn Error>> {
         match &s[..=5] {
             "- [ ] " => println!("{}", &s[6..]),
             "- [x] " => println!("{}", &s[6..].strikethrough().white()),
-            _ => ()
+            _ => (),
         }
         s
     });
@@ -120,9 +120,11 @@ fn add(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut new_content: String = get_data_file_content()?;
 
     for item in items {
-        new_content.push_str("- [ ] ");
-        new_content.push_str(item);
-        new_content.push('\n');
+        if !new_content.contains(item) {
+            new_content.push_str("- [ ] ");
+            new_content.push_str(item);
+            new_content.push('\n');
+        }
     }
 
     fs::write(get_data_file_path()?, new_content)?;
