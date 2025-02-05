@@ -8,4 +8,4 @@ done:
 
 remove:
 - [x] da implementare 
-- [ ] aggiungere flag --all -a per rimuovere tutto
+- [x] aggiungere flag --all -a per rimuovere tutto

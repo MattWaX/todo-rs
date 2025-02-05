@@ -8,7 +8,7 @@ use std::{
 };
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let matches = dbg!(args_parsing_setup());
+    let matches = args_parsing_setup();
 
     setup_file_location()?;
 
@@ -23,11 +23,11 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         }
         Some(("remove", matches)) => {
             if matches.get_flag("all") {
-                todo!();
+                remove_all()?;
             } else {
                 remove(matches)?;
             }
-        },
+        }
         _ => (),
     }
 
@@ -88,7 +88,6 @@ fn setup_file_location() -> Result<(), Box<dyn Error>> {
     match fs::exists(local_share_path.join(Path::new("todo.md"))) {
         Ok(file_exists) => {
             if !file_exists {
-                dbg!("creating files...");
                 fs::create_dir_all(&local_share_path)?;
                 fs::write(local_share_path.join(Path::new("todo.md")), "")?;
             }
@@ -156,8 +155,6 @@ fn done(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut new_content: String = String::from("");
     let mut change_flag: bool = false;
 
-    dbg!(&content);
-
     for line in content.lines() {
         for item in &items {
             if line.contains(&("- [ ] ".to_owned() + item).to_owned()) {
@@ -183,8 +180,6 @@ fn done(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
 fn done_all() -> Result<(), Box<dyn Error>> {
     let content: String = get_data_file_content()?;
     let mut new_content: String = String::from("");
-
-    dbg!(&content);
 
     for line in content.lines() {
         new_content.push_str("- [x] ");
@@ -214,5 +209,10 @@ fn remove(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     fs::write(get_data_file_path()?, new_content)?;
 
+    Ok(())
+}
+
+fn remove_all() -> Result<(), Box<dyn Error>> {
+    fs::write(get_data_file_path()?, "")?;
     Ok(())
 }
