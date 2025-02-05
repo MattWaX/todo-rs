@@ -8,13 +8,19 @@ use std::{
 };
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let matches = args_parsing_setup();
+    let matches = dbg!(args_parsing_setup());
 
     setup_file_location()?;
 
     match matches.subcommand() {
         Some(("add", matches)) => add(matches)?,
-        Some(("done", matches)) => done(matches)?,
+        Some(("done", matches)) => {
+            if matches.get_flag("all") {
+                done_all()?;
+            } else {
+                done(matches)?;
+            }
+        }
         Some(("remove", _matches)) => println!("remove"),
         _ => (),
     }
@@ -36,12 +42,18 @@ fn args_parsing_setup() -> ArgMatches {
             Command::new("done")
                 .about("mark as done items in the todo list")
                 .arg(arg!([ITEM]))
+                .arg(arg!(
+                        -a --all "mark as done all the items"
+                ))
                 .arg_required_else_help(true),
         )
         .subcommand(
             Command::new("remove")
                 .about("remove items from the todo list")
                 .arg(arg!([ITEM]))
+                .arg(arg!(
+                        -a --all "remove all the items"
+                ))
                 .arg_required_else_help(true),
         )
         .get_matches()
@@ -155,6 +167,23 @@ fn done(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
             new_content.push('\n');
         }
         change_flag = false;
+    }
+
+    fs::write(get_data_file_path()?, new_content)?;
+
+    Ok(())
+}
+
+fn done_all() -> Result<(), Box<dyn Error>> {
+    let content: String = get_data_file_content()?;
+    let mut new_content: String = String::from("");
+
+    dbg!(&content);
+
+    for line in content.lines() {
+        new_content.push_str("- [x] ");
+        new_content.push_str(&line[6..]);
+        new_content.push('\n');
     }
 
     fs::write(get_data_file_path()?, new_content)?;

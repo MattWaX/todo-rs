@@ -4,7 +4,7 @@ add:
  
 done:
 - [x] da implementare 
-- [ ] aggiungere flag --all -a per segnare tutto come fatto
+- [x] aggiungere flag --all -a per segnare tutto come fatto
 
 remove:
 - [ ] da implementare 
