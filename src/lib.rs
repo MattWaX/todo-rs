@@ -21,7 +21,13 @@ pub fn run() -> Result<(), Box<dyn Error>> {
                 done(matches)?;
             }
         }
-        Some(("remove", _matches)) => println!("remove"),
+        Some(("remove", matches)) => {
+            if matches.get_flag("all") {
+                todo!();
+            } else {
+                remove(matches)?;
+            }
+        },
         _ => (),
     }
 
@@ -184,6 +190,26 @@ fn done_all() -> Result<(), Box<dyn Error>> {
         new_content.push_str("- [x] ");
         new_content.push_str(&line[6..]);
         new_content.push('\n');
+    }
+
+    fs::write(get_data_file_path()?, new_content)?;
+
+    Ok(())
+}
+
+fn remove(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
+    let items = args_collect(matches, "ITEM");
+    let content: String = get_data_file_content()?;
+    let mut new_content: String = String::from("");
+
+    for line in content.lines() {
+        for item in &items {
+            if *item != &line[6..] {
+                new_content.push_str(line);
+                new_content.push('\n');
+                break;
+            }
+        }
     }
 
     fs::write(get_data_file_path()?, new_content)?;
